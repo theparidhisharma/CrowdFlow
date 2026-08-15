@@ -1,3 +1,15 @@
+import os as _os
+import sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from paths import (  # noqa: E402
+    VIDEO_PATH,
+    CONFIG_PATH,
+    ZONES_PATH,
+    META_PATH,
+    out as _out,
+)
+
+import os
 import csv
 import cv2
 import torch
@@ -38,9 +50,9 @@ print("Model loaded successfully!")
 # 2. VIDEO SETTINGS
 # ==========================================
 
-VIDEO_PATH = "videos/crowd.mp4"
-OUTPUT_PATH = "videos/crowd_tracked.mp4"
-CSV_PATH = "videos/tracks.csv"
+# Optional override used by the API job runner; manual runs are unchanged.
+OUTPUT_PATH = _out("crowd_tracked.mp4")
+CSV_PATH = _out("tracks.csv")
 
 
 # ==========================================
@@ -131,6 +143,33 @@ print(f"FPS: {fps}")
 print(
     f"Total frames: {total_frames}"
 )
+
+
+# ==========================================
+# 4b. RECORD PROCESSED VIDEO METADATA
+# ==========================================
+
+# Written so downstream tooling (single-camera zone generation) knows the
+# real processed frame size instead of guessing it.
+
+import json as _json  # noqa: E402
+
+with open(META_PATH, "w") as _meta_file:
+    _json.dump(
+        {
+            "video_path": VIDEO_PATH,
+            "original_width": original_width,
+            "original_height": original_height,
+            "width": width,
+            "height": height,
+            "fps": fps,
+            "total_frames": total_frames,
+        },
+        _meta_file,
+        indent=2,
+    )
+
+
 
 
 # ==========================================

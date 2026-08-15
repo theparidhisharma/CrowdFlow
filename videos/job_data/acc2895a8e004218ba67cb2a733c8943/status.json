@@ -1,0 +1,58 @@
+{
+  "job_id": "acc2895a8e004218ba67cb2a733c8943",
+  "filename": "test30.mp4",
+  "mode": "SINGLE_CAMERA",
+  "status": "processing",
+  "stage": "TRACKING",
+  "stages": [
+    {
+      "key": "UPLOAD",
+      "label": "Upload",
+      "status": "done"
+    },
+    {
+      "key": "TRACKING",
+      "label": "Tracking",
+      "status": "running"
+    },
+    {
+      "key": "CAMERA_REGION",
+      "label": "Camera Region Analysis",
+      "status": "pending"
+    },
+    {
+      "key": "DENSITY",
+      "label": "Density",
+      "status": "pending"
+    },
+    {
+      "key": "FLOW",
+      "label": "Flow",
+      "status": "pending"
+    },
+    {
+      "key": "CONGESTION",
+      "label": "Congestion",
+      "status": "pending"
+    },
+    {
+      "key": "EARLY_WARNING",
+      "label": "Early Warning",
+      "status": "pending"
+    },
+    {
+      "key": "PREDICTION",
+      "label": "Prediction",
+      "status": "pending"
+    },
+    {
+      "key": "COMPLETE",
+      "label": "Complete",
+      "status": "pending"
+    }
+  ],
+  "error": null,
+  "errorStage": null,
+  "createdAt": 1786789709.00658,
+  "finishedAt": null
+}

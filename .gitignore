@@ -42,7 +42,8 @@ videos/*.mp4
 videos/*.avi
 videos/*.mov
 
+# Uploaded videos (never committed)
+videos/uploads/
+videos/*.mkv
 
 .env
-.env.local
-.env.*.local

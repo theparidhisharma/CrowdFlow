@@ -1,3 +1,14 @@
+import os as _os
+import sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from paths import (  # noqa: E402
+    VIDEO_PATH,
+    CONFIG_PATH,
+    ZONES_PATH,
+    META_PATH,
+    out as _out,
+)
+
 import pandas as pd
 
 
@@ -5,9 +16,9 @@ import pandas as pd
 # 1. SETTINGS
 # ==========================================
 
-CSV_PATH = "videos/crowd_analysis.csv"
+CSV_PATH = _out("crowd_analysis.csv")
 
-OUTPUT_PATH = "videos/congestion_analysis.csv"
+OUTPUT_PATH = _out("congestion_analysis.csv")
 
 # Analyze every N frames
 WINDOW = 30

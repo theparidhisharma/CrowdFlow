@@ -1,3 +1,14 @@
+import os as _os
+import sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from paths import (  # noqa: E402
+    VIDEO_PATH,
+    CONFIG_PATH,
+    ZONES_PATH,
+    META_PATH,
+    out as _out,
+)
+
 import json
 import cv2
 import pandas as pd
@@ -8,9 +19,8 @@ import numpy as np
 # FILES
 # ==========================================
 
-TRACKS_PATH = "videos/tracks.csv"
-ZONES_PATH = "videos/zones.json"
-OUTPUT_PATH = "videos/zone_tracking.csv"
+TRACKS_PATH = _out("tracks.csv")
+OUTPUT_PATH = _out("zone_tracking.csv")
 
 
 # ==========================================
@@ -37,8 +47,17 @@ print(
 
 print("Loading zones...")
 
+if not _os.path.isfile(ZONES_PATH):
+    raise SystemExit(
+        f"Zone definition not found: {ZONES_PATH}\n"
+        "Configured-venue mode expects videos/zones.json (create it with "
+        "`python backend/define_zones.py`). Single-camera video jobs receive a "
+        "job-specific camera region via CROWDFLOW_ZONES."
+    )
+
 with open(ZONES_PATH, "r") as file:
     zone_data = json.load(file)
+
 
 
 zones = zone_data["zones"]

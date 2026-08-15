@@ -1,0 +1,3 @@
+zone,current_people,trend_people_per_minute,predicted_people_5_min,predicted_people_10_min,capacity,minutes_to_capacity,trend,prediction
+Zone 1,44,12,104,164,50,0.5,RISING,Capacity breach likely
+Zone 2,21,15,96,171,30,0.6,RISING,Capacity breach likely

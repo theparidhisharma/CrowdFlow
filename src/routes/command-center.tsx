@@ -13,6 +13,7 @@ import { SystemHealthPanel } from "@/components/command-center/SystemHealthPanel
 import { ZoneDetail } from "@/components/command-center/ZoneDetail";
 import { BeforeAfterComparison } from "@/components/interventions/BeforeAfterComparison";
 import { useDemo } from "@/state/demo-store";
+import { useBackendSource } from "@/hooks/use-backend-source";
 import { formatDuration } from "@/data/demo/scenario";
 import { runScenario } from "@/lib/simulationModel";
 
@@ -53,6 +54,7 @@ function CommandCenter() {
   const top = [...predictions].sort((a, b) => b.riskScore - a.riskScore)[0];
   const focusId = selectedZoneId ?? focusZoneId;
   const focusPrediction = predictions.find((p) => p.zoneId === focusId) ?? top;
+  const { label: sourceLabel, isSingleCamera } = useBackendSource();
   const verification = runScenario(
     crowd.zones,
     predictions,
@@ -63,6 +65,7 @@ function CommandCenter() {
   return (
     <AppShell>
       <div className="space-y-3 p-3">
+        <SourceBar label={sourceLabel} singleCamera={isSingleCamera} />
         {connection === "NO_DATA" ? <PipelineNotice /> : null}
         {connection === "OFFLINE" ? <OfflineNotice /> : null}
         <CriticalAlert />
@@ -88,7 +91,9 @@ function CommandCenter() {
               />
               <div className="pointer-events-none absolute top-3 left-3">
                 <p className="font-mono text-[11px] font-bold tracking-[0.2em] text-foreground/90">
-                  DIGITAL TWIN — LIVE CROWD FLOW
+                  {isSingleCamera
+                    ? "SINGLE CAMERA — CAMERA REGION"
+                    : "DIGITAL TWIN — LIVE CROWD FLOW"}
                 </p>
                 <p className="font-mono text-[9px] tracking-[0.18em] text-muted-foreground">
                   {crowd.currentCrowd.toLocaleString("en-IN")} PEOPLE TRACKED · CLICK A ZONE
@@ -106,14 +111,23 @@ function CommandCenter() {
         </div>
 
         {focusPrediction ? (
-          <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_360px]">
+          <div
+            className={
+              isSingleCamera
+                ? "grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+                : "grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_360px]"
+            }
+          >
             <PredictionChart prediction={focusPrediction} compact />
             <RootCausePanel zoneId={focusPrediction.zoneId} />
-            <InterventionPanel />
+            {/* Venue-level interventions require the configured venue topology. */}
+            {isSingleCamera ? null : <InterventionPanel />}
           </div>
         ) : null}
 
-        {verification ? (
+        {isSingleCamera ? <CameraGuidance /> : null}
+
+        {verification && !isSingleCamera ? (
           <section className="border border-border bg-panel p-3">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="tech-label text-foreground/85">Digital Twin Verification</h2>
@@ -126,6 +140,41 @@ function CommandCenter() {
         ) : null}
       </div>
     </AppShell>
+  );
+}
+
+function SourceBar({ label, singleCamera }: { label: string; singleCamera: boolean }) {
+  return (
+    <div className="flex flex-wrap items-center gap-3 border border-border bg-panel px-3 py-2">
+      <span className="font-mono text-[10px] tracking-[0.22em] text-muted-foreground uppercase">
+        Source
+      </span>
+      <span className="font-mono text-[11px] tracking-[0.18em] text-info uppercase">
+        {label}
+      </span>
+      <span className="font-mono text-[9px] tracking-[0.16em] text-muted-foreground uppercase">
+        {singleCamera
+          ? "Camera-level analysis only — no venue topology"
+          : "Configured venue topology"}
+      </span>
+    </div>
+  );
+}
+
+function CameraGuidance() {
+  return (
+    <section className="border border-border bg-panel p-3">
+      <h2 className="tech-label text-foreground/85">Camera-Level Guidance</h2>
+      <p className="mt-2 text-xs text-muted-foreground">
+        This footage was analysed as a single camera region. Density, flow, congestion and
+        risk values above describe only what this camera observed.
+      </p>
+      <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+        <li>• Venue routing and intervention recommendations are N/A for arbitrary footage.</li>
+        <li>• Cross-zone comparison is N/A — the camera provides a single region.</li>
+        <li>• Switch the source to Digital Twin to see venue-level recommendations.</li>
+      </ul>
+    </section>
   );
 }
 

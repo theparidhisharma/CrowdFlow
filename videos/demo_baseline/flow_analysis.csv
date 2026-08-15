@@ -1,0 +1,9 @@
+zone,direction,count
+Zone 1,north,3
+Zone 1,south,10
+Zone 1,east,27
+Zone 1,west,18
+Zone 2,north,24
+Zone 2,south,25
+Zone 2,east,22
+Zone 2,west,26

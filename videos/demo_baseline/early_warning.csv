@@ -1,0 +1,3 @@
+zone,people,area_m2,density_people_m2,capacity,capacity_usage,entries_per_minute,exits_per_minute,net_flow_per_minute,minutes_to_capacity,risk_score,risk_level,prediction,recommendation
+Zone 1,44,100,0.44,50,88.0,19,7,12,0.5,88,CRITICAL,Zone 1 at 88.0% of capacity,Divert inbound flow and open alternate egress
+Zone 2,21,60,0.35,30,70.0,19,4,15,0.6,78,HIGH,Zone 2 at 70.0% of capacity,Divert inbound flow and open alternate egress

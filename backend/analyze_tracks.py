@@ -1,3 +1,15 @@
+import os as _os
+import sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from paths import (  # noqa: E402
+    VIDEO_PATH,
+    CONFIG_PATH,
+    ZONES_PATH,
+    META_PATH,
+    out as _out,
+)
+
+import os
 import pandas as pd
 import numpy as np
 import cv2
@@ -7,11 +19,12 @@ import cv2
 # 1. FILE SETTINGS
 # ==========================================
 
-CSV_PATH = "videos/tracks.csv"
+CSV_PATH = _out("tracks.csv")
 
-OUTPUT_VIDEO = "videos/crowd_flow.mp4"
+OUTPUT_VIDEO = _out("crowd_flow.mp4")
 
-VIDEO_PATH = "videos/crowd.mp4"
+# Optional override used by the API job runner; manual runs are unchanged.
+
 
 
 # ==========================================
@@ -203,7 +216,7 @@ df["zone"] = df.apply(
 # 8. SAVE ENHANCED TRACKING DATA
 # ==========================================
 
-OUTPUT_CSV = "videos/crowd_analysis.csv"
+OUTPUT_CSV = _out("crowd_analysis.csv")
 
 df.to_csv(
     OUTPUT_CSV,

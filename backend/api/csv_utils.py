@@ -18,7 +18,59 @@ PROJECT_ROOT = os.path.abspath(
 )
 
 VIDEOS_DIR = os.path.join(PROJECT_ROOT, "videos")
+JOB_DATA_DIR = os.path.join(VIDEOS_DIR, "job_data")
 VENUE_CONFIG_PATH = os.path.join(PROJECT_ROOT, "backend", "venue_config.json")
+
+# ------------------------------------------------------------------
+# ACTIVE DATA SOURCE
+#
+# DIGITAL_TWIN  -> configured venue artifacts in videos/
+# SINGLE_CAMERA -> artifacts of one completed video job in
+#                  videos/job_data/<job_id>/
+#
+# Switching the source never moves or overwrites files: the data endpoints
+# simply read from a different directory.
+# ------------------------------------------------------------------
+
+DIGITAL_TWIN = "DIGITAL_TWIN"
+SINGLE_CAMERA = "SINGLE_CAMERA"
+
+_source: Dict[str, Any] = {
+    "mode": DIGITAL_TWIN,
+    "dir": VIDEOS_DIR,
+    "job_id": None,
+    "label": "Digital Twin",
+    "config": VENUE_CONFIG_PATH,
+}
+
+
+def set_source(
+    mode: str,
+    directory: str,
+    job_id: Optional[str] = None,
+    config_path: Optional[str] = None,
+) -> None:
+    _source.update(
+        {
+            "mode": mode,
+            "dir": directory,
+            "job_id": job_id,
+            "label": "Single Camera" if mode == SINGLE_CAMERA else "Digital Twin",
+            "config": config_path or VENUE_CONFIG_PATH,
+        }
+    )
+
+
+def reset_source() -> None:
+    set_source(DIGITAL_TWIN, VIDEOS_DIR, None, VENUE_CONFIG_PATH)
+
+
+def source() -> Dict[str, Any]:
+    return dict(_source)
+
+
+def data_dir() -> str:
+    return str(_source["dir"])
 
 
 class PipelineNotRun(Exception):
@@ -33,7 +85,8 @@ class PipelineNotRun(Exception):
 
 
 def video_path(filename: str) -> str:
-    return os.path.join(VIDEOS_DIR, filename)
+    return os.path.join(data_dir(), filename)
+
 
 
 def exists(filename: str) -> bool:
@@ -63,7 +116,9 @@ def coerce(value: str) -> Any:
 def read_csv(filename: str, stage: str) -> List[Dict[str, Any]]:
     path = video_path(filename)
     if not os.path.isfile(path):
-        raise PipelineNotRun(f"videos/{filename}", stage)
+        rel = os.path.relpath(path, PROJECT_ROOT).replace(os.sep, "/")
+        raise PipelineNotRun(rel, stage)
+
     with open(path, "r", newline="") as handle:
         reader = csv.DictReader(handle)
         return [{k: coerce(v) for k, v in row.items() if k is not None} for row in reader]
@@ -74,6 +129,20 @@ def read_csv_optional(filename: str) -> Optional[List[Dict[str, Any]]]:
         return read_csv(filename, stage="")
     except PipelineNotRun:
         return None
+
+
+def read_csv_in(directory: str, filename: str) -> Optional[List[Dict[str, Any]]]:
+    """Read a pipeline CSV from an explicit directory (e.g. a job directory).
+
+    Returns None when the file was never produced — callers surface that as
+    "N/A" instead of substituting a value.
+    """
+    path = os.path.join(directory, filename)
+    if not os.path.isfile(path):
+        return None
+    with open(path, "r", newline="") as handle:
+        reader = csv.DictReader(handle)
+        return [{k: coerce(v) for k, v in row.items() if k is not None} for row in reader]
 
 
 def latest_per_zone(
@@ -101,5 +170,14 @@ def latest_per_zone(
 
 
 def load_venue_config() -> Dict[str, Any]:
-    with open(VENUE_CONFIG_PATH, "r") as handle:
+    """Configuration of the ACTIVE source.
+
+    Digital Twin  -> backend/venue_config.json (physical area + capacity).
+    Single Camera -> the job's camera configuration (no invented physical area).
+    """
+    path = str(_source.get("config") or VENUE_CONFIG_PATH)
+    if not os.path.isfile(path):
+        path = VENUE_CONFIG_PATH
+    with open(path, "r") as handle:
         return json.load(handle)
+

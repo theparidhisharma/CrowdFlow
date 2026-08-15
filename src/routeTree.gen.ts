@@ -16,6 +16,7 @@ import { Route as IncidentsRouteImport } from './routes/incidents'
 import { Route as InfrastructureRouteImport } from './routes/infrastructure'
 import { Route as PredictionsRouteImport } from './routes/predictions'
 import { Route as SimulatorRouteImport } from './routes/simulator'
+import { Route as VideoAnalysisRouteImport } from './routes/video-analysis'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +53,11 @@ const SimulatorRoute = SimulatorRouteImport.update({
   path: '/simulator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VideoAnalysisRoute = VideoAnalysisRouteImport.update({
+  id: '/video-analysis',
+  path: '/video-analysis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/infrastructure': typeof InfrastructureRoute
   '/predictions': typeof PredictionsRoute
   '/simulator': typeof SimulatorRoute
+  '/video-analysis': typeof VideoAnalysisRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/infrastructure': typeof InfrastructureRoute
   '/predictions': typeof PredictionsRoute
   '/simulator': typeof SimulatorRoute
+  '/video-analysis': typeof VideoAnalysisRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/infrastructure': typeof InfrastructureRoute
   '/predictions': typeof PredictionsRoute
   '/simulator': typeof SimulatorRoute
+  '/video-analysis': typeof VideoAnalysisRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/infrastructure'
     | '/predictions'
     | '/simulator'
+    | '/video-analysis'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/infrastructure'
     | '/predictions'
     | '/simulator'
+    | '/video-analysis'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/infrastructure'
     | '/predictions'
     | '/simulator'
+    | '/video-analysis'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +131,7 @@ export interface RootRouteChildren {
   InfrastructureRoute: typeof InfrastructureRoute
   PredictionsRoute: typeof PredictionsRoute
   SimulatorRoute: typeof SimulatorRoute
+  VideoAnalysisRoute: typeof VideoAnalysisRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SimulatorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/video-analysis': {
+      id: '/video-analysis'
+      path: '/video-analysis'
+      fullPath: '/video-analysis'
+      preLoaderRoute: typeof VideoAnalysisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   InfrastructureRoute: InfrastructureRoute,
   PredictionsRoute: PredictionsRoute,
   SimulatorRoute: SimulatorRoute,
+  VideoAnalysisRoute: VideoAnalysisRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

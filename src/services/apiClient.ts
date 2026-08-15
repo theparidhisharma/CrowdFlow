@@ -146,6 +146,7 @@ export interface ApiTimeline {
 
 export const api = {
   health: (signal?: AbortSignal) => apiGet<{ status: string }>("/api/health", signal),
+  source: (signal?: AbortSignal) => apiGet<ApiSource>("/api/source", signal),
   venue: (signal?: AbortSignal) => apiGet<ApiVenue>("/api/venue", signal),
   current: (signal?: AbortSignal) => apiGet<ApiCurrent>("/api/crowd/current", signal),
   density: (signal?: AbortSignal) =>
@@ -162,4 +163,156 @@ export const api = {
   predictions: (signal?: AbortSignal) =>
     apiGet<{ zones: ApiPredictionZone[] }>("/api/predictions", signal),
   timeline: (signal?: AbortSignal) => apiGet<ApiTimeline>("/api/crowd/timeline", signal),
+};
+
+// ---- Active analysis source (/api/source) ----
+
+export type SourceMode = "DIGITAL_TWIN" | "SINGLE_CAMERA";
+
+export interface ApiSource {
+  mode: SourceMode;
+  label: string;
+  jobId: string | null;
+  modes: SourceMode[];
+  digitalTwinAvailable: boolean;
+  digitalTwinZonesConfigured: boolean;
+}
+
+export async function setSource(
+  mode: SourceMode,
+  jobId?: string | null,
+  signal?: AbortSignal,
+): Promise<ApiSource> {
+  const res = await fetch(`${API_BASE_URL}/api/source`, {
+    method: "POST",
+    signal: signal ?? null,
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify({ mode, job_id: jobId ?? null }),
+  });
+  if (!res.ok) {
+    let detail: unknown;
+    try {
+      detail = (await res.json())?.detail;
+    } catch {
+      detail = undefined;
+    }
+    const message =
+      typeof detail === "object" && detail && "message" in detail
+        ? String((detail as { message: unknown }).message)
+        : `Could not switch source (${res.status})`;
+    throw new ApiError(message, res.status, detail);
+  }
+  return (await res.json()) as ApiSource;
+}
+
+// ---- Video analysis (upload -> existing Python pipeline) ----
+
+export type VideoJobStatus = "uploaded" | "processing" | "completed" | "failed";
+
+export interface VideoJobStage {
+  key: string;
+  label: string;
+  status: "pending" | "running" | "done" | "skipped" | "failed";
+}
+
+export interface VideoJob {
+  job_id: string;
+  filename: string;
+  mode?: SourceMode;
+  status: VideoJobStatus;
+  stage: string | null;
+  stages: VideoJobStage[];
+  error: string | null;
+  createdAt: number;
+  finishedAt: number | null;
+}
+
+export interface VideoUploadAck {
+  job_id: string;
+  filename: string;
+  status: VideoJobStatus;
+  mode?: SourceMode;
+}
+
+/** Result of one completed job — every field is a real pipeline output or null. */
+export interface VideoResultSummary {
+  peopleTracked: number | null;
+  peopleLatestFrame: number | null;
+  latestFrame: number | null;
+  activeZones: number | null;
+  highestDensityZone: string | null;
+  highestDensity: number | null;
+  densityLevel: string | null;
+  highestRiskZone: string | null;
+  highestRiskScore: number | null;
+  highestRiskLevel: string | null;
+}
+
+export interface VideoResultPrediction {
+  available: boolean;
+  reason: string | null;
+  zone: string | null;
+  minutesToCapacity: number | null;
+  trend: string | null;
+  statement: string | null;
+}
+
+export interface VideoResult {
+  job_id: string;
+  filename: string;
+  mode: SourceMode;
+  status: VideoJobStatus;
+  isActiveSource: boolean;
+  summary: VideoResultSummary;
+  prediction: VideoResultPrediction;
+  artifacts: Record<string, boolean>;
+  zones: {
+    density: ApiDensityZone[];
+    flow: Array<Record<string, unknown>>;
+    congestion: ApiCongestionZone[];
+    warnings: ApiWarningZone[];
+    predictions: ApiPredictionZone[];
+  };
+}
+
+async function apiPostFile<T>(
+  path: string,
+  file: File,
+  fields: Record<string, string> = {},
+  signal?: AbortSignal,
+): Promise<T> {
+  const body = new FormData();
+  body.append("file", file);
+  Object.entries(fields).forEach(([key, value]) => body.append(key, value));
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    method: "POST",
+    body,
+    signal: signal ?? null,
+    headers: { Accept: "application/json" },
+  });
+  if (!res.ok) {
+    let detail: unknown;
+    try {
+      detail = (await res.json())?.detail;
+    } catch {
+      detail = undefined;
+    }
+    const message =
+      typeof detail === "object" && detail && "message" in detail
+        ? String((detail as { message: unknown }).message)
+        : `Upload failed (${res.status})`;
+    throw new ApiError(message, res.status, detail);
+  }
+  return (await res.json()) as T;
+}
+
+export const videoApi = {
+  upload: (file: File, mode: SourceMode = "SINGLE_CAMERA", signal?: AbortSignal) =>
+    apiPostFile<VideoUploadAck>("/api/video/upload", file, { mode }, signal),
+  status: (jobId: string, signal?: AbortSignal) =>
+    apiGet<VideoJob>(`/api/video/status/${encodeURIComponent(jobId)}`, signal),
+  result: (jobId: string, signal?: AbortSignal) =>
+    apiGet<VideoResult>(`/api/video/result/${encodeURIComponent(jobId)}`, signal),
+  active: (signal?: AbortSignal) =>
+    apiGet<{ active: VideoJob | null }>("/api/video/active", signal),
 };

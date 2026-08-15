@@ -1,0 +1,58 @@
+{
+  "job_id": "372cb2a0f10b458d9333ee1dc8888836",
+  "filename": "WhatsApp Video 2026-08-15 at 10.29.47 AM.mp4",
+  "mode": "SINGLE_CAMERA",
+  "status": "processing",
+  "stage": "TRACKING",
+  "stages": [
+    {
+      "key": "UPLOAD",
+      "label": "Upload",
+      "status": "done"
+    },
+    {
+      "key": "TRACKING",
+      "label": "Tracking",
+      "status": "running"
+    },
+    {
+      "key": "CAMERA_REGION",
+      "label": "Camera Region Analysis",
+      "status": "pending"
+    },
+    {
+      "key": "DENSITY",
+      "label": "Density",
+      "status": "pending"
+    },
+    {
+      "key": "FLOW",
+      "label": "Flow",
+      "status": "pending"
+    },
+    {
+      "key": "CONGESTION",
+      "label": "Congestion",
+      "status": "pending"
+    },
+    {
+      "key": "EARLY_WARNING",
+      "label": "Early Warning",
+      "status": "pending"
+    },
+    {
+      "key": "PREDICTION",
+      "label": "Prediction",
+      "status": "pending"
+    },
+    {
+      "key": "COMPLETE",
+      "label": "Complete",
+      "status": "pending"
+    }
+  ],
+  "error": null,
+  "errorStage": null,
+  "createdAt": 1786791768.9075024,
+  "finishedAt": null
+}

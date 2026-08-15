@@ -20,8 +20,8 @@ fallbacks.
 ## 1. Run the frontend
 
 ```bash
-npm install
-npm run dev            # http://localhost:8080
+bun install
+bun run dev            # http://localhost:8080
 ```
 
 `.env` holds the API location:

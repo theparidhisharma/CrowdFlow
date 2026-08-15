@@ -1,3 +1,15 @@
+import os as _os
+import sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from paths import (  # noqa: E402
+    VIDEO_PATH,
+    CONFIG_PATH,
+    ZONES_PATH,
+    META_PATH,
+    out as _out,
+)
+
+import os
 import json
 import math
 import cv2
@@ -9,13 +21,14 @@ import numpy as np
 # FILES
 # ==========================================
 
-VIDEO_PATH = "videos/crowd.mp4"
+# Optional override used by the API job runner; manual runs are unchanged.
 
-TRACKING_PATH = "videos/zone_tracking.csv"
 
-CONFIG_PATH = "backend/venue_config.json"
+TRACKING_PATH = _out("zone_tracking.csv")
 
-OUTPUT_PATH = "videos/crowd_prediction.csv"
+
+
+OUTPUT_PATH = _out("crowd_prediction.csv")
 
 
 # ==========================================
@@ -388,15 +401,16 @@ for zone_name, zone_info in zones_config.items():
     if not enough_history:
 
         prediction = (
-            "COLLECTING MORE HISTORY"
+            "INSUFFICIENT HISTORY"
         )
 
 
-    elif current_people >= capacity:
+    elif capacity > 0 and current_people >= capacity:
 
         prediction = (
             "CAPACITY REACHED"
         )
+
 
 
     elif (

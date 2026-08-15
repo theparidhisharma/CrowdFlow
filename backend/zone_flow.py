@@ -1,3 +1,15 @@
+import os as _os
+import sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from paths import (  # noqa: E402
+    VIDEO_PATH,
+    CONFIG_PATH,
+    ZONES_PATH,
+    META_PATH,
+    out as _out,
+)
+
+import os
 import pandas as pd
 import cv2
 
@@ -6,13 +18,14 @@ import cv2
 # FILE SETTINGS
 # ==========================================
 
-INPUT_PATH = "videos/zone_tracking.csv"
+INPUT_PATH = _out("zone_tracking.csv")
 
-VIDEO_PATH = "videos/crowd.mp4"
+# Optional override used by the API job runner; manual runs are unchanged.
 
-OUTPUT_PATH = "videos/zone_flow.csv"
 
-EVENTS_OUTPUT_PATH = "videos/zone_flow_events.csv"
+OUTPUT_PATH = _out("zone_flow.csv")
+
+EVENTS_OUTPUT_PATH = _out("zone_flow_events.csv")
 
 
 # ==========================================

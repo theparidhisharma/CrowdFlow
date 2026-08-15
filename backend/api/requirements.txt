@@ -1,2 +1,16 @@
 fastapi>=0.110
 uvicorn[standard]>=0.27
+python-multipart>=0.0.9
+
+# Dependencies of the existing pipeline scripts
+# (tracker.py / zone_analysis.py / density_analysis.py / zone_flow.py /
+#  flow_analysis.py / zone_congestion.py / early_warning.py /
+#  crowd_prediction.py) — RT-DETR detection + ByteTrack tracking.
+opencv-python>=4.8
+torch>=2.0
+numpy>=1.24
+pandas>=2.0
+Pillow>=10.0
+transformers>=4.40
+supervision>=0.20
+trackers>=2.0

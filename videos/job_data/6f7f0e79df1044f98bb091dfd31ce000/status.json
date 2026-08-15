@@ -1,0 +1,58 @@
+{
+  "job_id": "6f7f0e79df1044f98bb091dfd31ce000",
+  "filename": "test30.mp4",
+  "mode": "SINGLE_CAMERA",
+  "status": "failed",
+  "stage": "TRACKING",
+  "stages": [
+    {
+      "key": "UPLOAD",
+      "label": "Upload",
+      "status": "done"
+    },
+    {
+      "key": "TRACKING",
+      "label": "Tracking",
+      "status": "failed"
+    },
+    {
+      "key": "CAMERA_REGION",
+      "label": "Camera Region Analysis",
+      "status": "pending"
+    },
+    {
+      "key": "DENSITY",
+      "label": "Density",
+      "status": "pending"
+    },
+    {
+      "key": "FLOW",
+      "label": "Flow",
+      "status": "pending"
+    },
+    {
+      "key": "CONGESTION",
+      "label": "Congestion",
+      "status": "pending"
+    },
+    {
+      "key": "EARLY_WARNING",
+      "label": "Early Warning",
+      "status": "pending"
+    },
+    {
+      "key": "PREDICTION",
+      "label": "Prediction",
+      "status": "pending"
+    },
+    {
+      "key": "COMPLETE",
+      "label": "Complete",
+      "status": "pending"
+    }
+  ],
+  "error": "tracker.py:     return _bootstrap._gcd_import(name[level:], package, level) /            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ / ImportError: libxcb.so.1: cannot open shared object file: No such file or directory",
+  "errorStage": "TRACKING FAILED",
+  "createdAt": 1786789681.0699027,
+  "finishedAt": 1786789681.4418435
+}

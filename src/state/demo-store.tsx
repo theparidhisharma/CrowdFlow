@@ -8,7 +8,11 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { getProvider, type DataSourceMode } from "@/services/provider";
+import {
+  getProvider,
+  resetBackendProvider,
+  type DataSourceMode,
+} from "@/services/provider";
 import { ApiError } from "@/services/apiClient";
 import type {
   HotspotStat,
@@ -35,6 +39,8 @@ interface DemoStore {
   mode: "DEMO" | "LIVE";
   dataSource: DataSourceMode;
   setDataSource: (mode: DataSourceMode) => void;
+  /** Forces an immediate re-read of the backend (used after a video analysis). */
+  refreshBackend: () => void;
   connection: ConnectionStatus;
   connectionError: string | null;
   /** epoch ms of the last successful backend payload (null in demo mode) */
@@ -90,6 +96,7 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
   const [connection, setConnection] = useState<ConnectionStatus>("DEMO");
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
+  const [refreshTick, setRefreshTick] = useState(0);
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [hotspots, setHotspots] = useState<HotspotStat[]>([]);
   const [infrastructure, setInfrastructure] = useState<InfrastructureRecommendation[]>([]);
@@ -100,6 +107,11 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stored = readStoredMode();
     if (stored !== "DEMO") setDataSourceState(stored);
+  }, []);
+
+  const refreshBackend = useCallback(() => {
+    resetBackendProvider();
+    setRefreshTick((t) => t + 1);
   }, []);
 
   const setDataSource = useCallback((next: DataSourceMode) => {
@@ -187,7 +199,7 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       cancelled = true;
       window.clearInterval(id);
     };
-  }, [dataSource]);
+  }, [dataSource, refreshTick]);
 
   // Historical intelligence (incidents / hotspots / infrastructure) is loaded
   // once per data source — it changes far more slowly than the live state.
@@ -232,6 +244,7 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       mode: dataSource === "BACKEND" ? "LIVE" : "DEMO",
       dataSource,
       setDataSource,
+      refreshBackend,
       connection,
       connectionError,
       lastUpdatedAt,
@@ -276,6 +289,7 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       applyIntervention,
       dataSource,
       setDataSource,
+      refreshBackend,
       connection,
       connectionError,
       lastUpdatedAt,

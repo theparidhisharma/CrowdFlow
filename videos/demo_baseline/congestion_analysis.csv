@@ -1,0 +1,3 @@
+zone,frame,people,previous_people,density_change,growth_rate,congestion,trend
+Zone 1,570,44,40,4,0.1,BUILDING,RISING
+Zone 2,570,21,25,-4,-0.16,EASING,FALLING

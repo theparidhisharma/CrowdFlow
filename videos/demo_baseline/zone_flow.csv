@@ -1,0 +1,7 @@
+zone,minute,entries_per_minute,exits_per_minute,net_flow_per_minute,flow_status
+Zone 1,1,19,7,12,INFLOW
+Zone 1,2,15,6,9,INFLOW
+Zone 1,3,9,8,1,INFLOW
+Zone 2,1,19,4,15,INFLOW
+Zone 2,2,25,18,7,INFLOW
+Zone 2,3,8,17,-9,OUTFLOW

@@ -1,3 +1,14 @@
+import os as _os
+import sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from paths import (  # noqa: E402
+    VIDEO_PATH,
+    CONFIG_PATH,
+    ZONES_PATH,
+    META_PATH,
+    out as _out,
+)
+
 import json
 import math
 import pandas as pd
@@ -7,13 +18,13 @@ import pandas as pd
 # FILES
 # ==========================================
 
-TRACKING_PATH = "videos/zone_tracking.csv"
+TRACKING_PATH = _out("zone_tracking.csv")
 
-FLOW_PATH = "videos/zone_flow.csv"
+FLOW_PATH = _out("zone_flow.csv")
 
-CONFIG_PATH = "backend/venue_config.json"
 
-OUTPUT_PATH = "videos/early_warning.csv"
+
+OUTPUT_PATH = _out("early_warning.csv")
 
 
 # ==========================================
